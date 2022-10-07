@@ -52,6 +52,13 @@ class Recipe:
     def get_all(cls):
         query = "SELECT recipes.*, first_name FROM recipes LEFT JOIN users ON users.id = recipes.user_id;"
         results = connectToMySQL('recetas').query_db(query) #Lista de Diccionarios
+         #result = [
+        #    {id: 1, name: albondigas, description: bolitas de carne....}
+        #    {id: 2, name: albondigas, description: bolitas de carne....}
+        #    {id: 3, name: albondigas, description: bolitas de carne....}
+        #    {id: 4, name: albondigas, description: bolitas de carne....}
+        #    {id: 5, name: albondigas, description: bolitas de carne....}
+        #]
         recipes = []
 
         for recipe in results:
@@ -59,3 +66,28 @@ class Recipe:
             recipes.append(cls(recipe)) #1.- cls(recipe) creamos la instancia en base al diccionario, 2.- recipes.append agrego esa instancia a la lista recipes
         
         return recipes
+
+    @classmethod
+    def get_by_id(cls, formulario):
+        #formulario = {id: 1}
+        query = "SELECT recipes.*, first_name FROM recipes LEFT JOIN users ON users.id = recipes.user_id WHERE recipes.id = %(id)s ;"
+        result = connectToMySQL('recetas').query_db(query, formulario) #Al hacer un select recibimos una lista con UN diccionario dentro
+        #result = [
+        #    {id: 1, name: albondigas, description: bolitas de carne....}
+        #]
+        recipe = cls(result[0]) #result[0] = diccionario con todos los datos de la receta; cls() creamos la instancia en base a ese diccionario
+        return recipe
+
+    @classmethod
+    def update(cls, formulario):
+        #formulario = {name: Albondigas, description: bolitas de carne, instructions:......., recipe_id: 1}
+        query = "UPDATE recipes SET name=%(name)s, description=%(description)s, instructions=%(instructions)s, date_made=%(date_made)s, under_30=%(under_30)s WHERE id=%(recipe_id)s "
+        result = connectToMySQL('recetas').query_db(query, formulario)
+        return result
+
+    @classmethod
+    def delete(cls, formulario):
+        #formulario = {id: 1}
+        query = "DELETE FROM recipes WHERE id = %(id)s"
+        result = connectToMySQL('recetas').query_db(query, formulario)
+        return result
